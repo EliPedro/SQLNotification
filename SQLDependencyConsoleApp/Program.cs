@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SQLDependencyConsoleApp
 {
@@ -13,15 +8,15 @@ namespace SQLDependencyConsoleApp
 
         static void Main(string[] args)
         {
-                Teste t = new Teste();
-                Initialization();
+            Teste t = new Teste();
+            Initialization();
 
-                t.RegisterNotification();
+            t.RegisterNotification();
 
-                Console.ReadKey();
+            Console.ReadKey();
         }
 
-        static void  Initialization()
+        static void Initialization()
         {
             // Create a dependency connection.
             SqlDependency.Start(@"Data Source=DESKTOP-D3PU4S0\SQLEXPRESS;Initial Catalog=TESTESQLNOTIFICATION;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
@@ -30,10 +25,10 @@ namespace SQLDependencyConsoleApp
 
     public class Teste
     {
-        
+
         public void RegisterNotification()
         {
-            
+
             var cs = @"Data Source=DESKTOP-D3PU4S0\SQLEXPRESS;Initial Catalog=TESTESQLNOTIFICATION;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
             var sql = @"SELECT CAMPO_2  FROM dbo.TESTE";
@@ -45,14 +40,8 @@ namespace SQLDependencyConsoleApp
                     cmd.Notification = null;
                     var sqlDependency = new SqlDependency(cmd);
                     sqlDependency.OnChange += SqlDependency_OnChange;
+                    cmd.ExecuteReaderAsync();
 
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.HasRows)
-                    {
-                        Console.WriteLine(reader["CAMPO_2"]);
-                    
-                    }
                 }
             }
 
@@ -60,7 +49,7 @@ namespace SQLDependencyConsoleApp
 
         private void SqlDependency_OnChange(object sender, SqlNotificationEventArgs e)
         {
-            if (e.Type == SqlNotificationType.Change)
+            if (e.Info == SqlNotificationInfo.Update)
             {
                 RegisterNotification();
 
@@ -68,5 +57,5 @@ namespace SQLDependencyConsoleApp
         }
     }
 }
-    
+
 
